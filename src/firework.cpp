@@ -5,24 +5,19 @@ void gotoxy(int x, int y) {
     fflush(stdout);
 }
 
-template <int NUM_BRANCH>
-void firework<NUM_BRANCH>::draw_floor() const {
-    for (int i = 0; i < this->termwidth; ++i) {
-        gotoxy(i, this->termheight);
+void draw_floor(int width, int height) {
+    for (int i = 0; i < width; ++i) {
+        gotoxy(i, height);
         fputs("─", stdout);
     }
 }
 
 template <int NUM_BRANCH>
 bool firework<NUM_BRANCH>::draw_update() {
-    for (int i = 0; i < this->speed; ++i) {
-        if (!this->launch_finished) {
-            this->draw_launch();
-        } else if (!this->pop_finished) {
-            this->draw_pop();
-        } else {
-            break;
-        }
+    if (!this->launch_finished) {
+        this->draw_launch();
+    } else if (!this->pop_finished) {
+        this->draw_pop();
     }
     return this->pop_finished;
 }
@@ -30,9 +25,9 @@ bool firework<NUM_BRANCH>::draw_update() {
 template <int NUM_BRANCH>
 void firework<NUM_BRANCH>::draw_launch() {
     if (!this->launch_finished) {
-        if (this->current_height <= this->height) {
-            gotoxy(this->center, this->termheight - this->current_height);
-            fputs("│", stdout);
+        if (this->current_height + 1 <= this->height) {
+            gotoxy(this->center, this->bottom - this->current_height - 1);
+            fputs("|", stdout);
             ++(this->current_height);
         } else
             this->launch_finished = true;
@@ -46,7 +41,7 @@ void firework<NUM_BRANCH>::draw_pop() {
             for (double direction : this->directions) {
                 int x = this->center
                         - (this->current_radius * std::sin(direction) * 2);
-                int y = this->termheight
+                int y = this->bottom
                         - (this->height
                            + this->current_radius * std::cos(direction));
                 gotoxy(x, y);
